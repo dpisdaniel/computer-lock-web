@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ComputerLock</title>
+        <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script id="window-switcher">
+            function switchPage(from, to){
+                from.parentNode.parentNode.parentNode.classList.add("swF");
+                $("#"+to).addClass("swT");
+                
+                $(".swF").css("position", 'absolute');
+                $(".swT").css("position", 'relative');
+                
+                $(".swT").css("top",$(".swF").css("top"));
+                $(".swF").css("top",-1000);
+                $(".swT").css("top", 0);
+                
+                setTimeout(function(){
+                $(".swT").removeClass("swT");
+                $(".swF").removeClass("swF");
+                },600);
+            }
+        </script>
+        
+    </head>
+
+    <body>
+        
+        <header id="header">
+            <div class="wrapper">
+                <div id="logo">
+                    <a href="index.html">ComputerLock</a>
+                </div>
+                <nav id="navigation">
+                    <ul class="main-nav">
+                        <li><a href="/settings">EDIT YOUR SETTINGS</a></li>
+                        <li><a href="/notifications">VIEW NOTIFICATIONS</a></li>
+                        <li><a href="/contact">CONTACT</a></li>
+                    </ul>
+                    
+                    <ul class="tool-nav">
+                        <li class="user">
+                            <a href="/log_in">Log &nbsp;&nbsp; in</a>
+                            <span>or</span>
+                            <a class="sign-up highlight" href="/sign_up">Sign &nbsp;&nbsp; up</a>
+                        </li>
+                    </ul>
+                </nav>
+                
+            </div>
+            
+        </header>
+        
+        <section>
+            <div class="page-content">
+                <div class="wrapper">
+                    
+                    <div class="page-title">
+                        <h1>Sign up!</h1>
+                    </div>
+                    
+                    <div class="page-content">
+                        <div class="row smooth-animation" style="top: -1000px; position: absolute;" id="login">
+                            <div class="title">
+                                <div class="title-text">Log in</div>
+                            </div>
+                            
+                            <div class="content">
+                                <br>
+                                <form action="submit_login" method="POST" class="center">
+                                    <div class="input">
+                                        <input type="text" name="username" required placeholder="Username">
+                                    </div>
+                                    
+                                    <p style="line-height: 15px"></p>
+                                    <div class="input">
+                                        <input type="password" name="password" required placeholder="Password">
+                                    </div>
+                                    <p style="line-height: 15px"></p>
+                                    <div style="text-align:center;">
+                                        <button type="submit">Log in</button>
+                                    </div>
+                                </form>
+                                <div style="text-align:center;">
+                                    <hr class="splitter">
+                                    Don't have an account?
+                                    <div style="font-size: 8px;"><br></div>
+                                    <button onclick="switchPage(this, 'register')">Sign up</button>
+                                    <div><br></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="row smooth-animation" style="top: 0px;" id="register">
+                            <div class="title">
+                                <div class="title-text">Sign up</div>
+                            </div>
+                            
+                            <div class="content">
+                                <br>
+                                <form action="submit_signup" method="POST" class="center">
+                                    <div class="input">
+                                        <input type="text" name="username" required placeholder="Username">
+                                    </div>
+                                    
+                                    <p style="line-height: 15px"></p>
+                                    <div class="input">
+                                        <input type="password" name="password" required placeholder="Password">
+                                    </div>
+                                    <p style="line-height: 15px"></p>
+                                    <div style="text-align:center;">
+                                        <button type="submit">Sign up</button>
+                                    </div>
+                                </form>
+                                <div style="text-align:center;">
+                                    <hr class="splitter">
+                                    Already have an account?
+                                    <div style="font-size: 8px;"><br></div>
+                                    <button onclick="switchPage(this, 'login')">Login</button>
+                                    <div><br></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <div class="wrapper">
+                <nav>
+                    <ul>
+                        <li><a href="/index">HOME</a></li>
+                        <li><a href="/settings">EDIT YOUR SETTINGS</a></li>
+                        <li><a href="/notifications">VIEW NOTIFICATIONS</a></li>
+                        <li><a href="/contact">CONTACT</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </footer>
+    </body>
+</html>
