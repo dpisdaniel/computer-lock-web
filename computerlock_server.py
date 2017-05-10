@@ -12,7 +12,7 @@ import json
 USERNAME_ELEMENT = 'username'
 PASSWORD_ELEMENT = 'password'
 ADDED_SETTINGS_ELEMENT = 'added-settings'
-WEB_SERVER_PORT = 5000
+WEB_SERVER_PORT = 8000
 CURRENT_WORKING_DIRECTORY = os.getcwd()  # Gives easy access to our server's files' path.
 CODE_FILES_PATH = CURRENT_WORKING_DIRECTORY + '\\Templates\\'  # The path to where all the server files are saved at
 DB_PATH = CODE_FILES_PATH + 'userbase.db'
@@ -22,6 +22,7 @@ PROCESS_TUPLE = 0
 PATHS_TUPLE = 1
 EXTENSION_TUPLE = 2
 DEFAULT_DB_VALUE = ''
+REMOVE_SETTINGS_ELEMENT = 'removed-settings'
 
 # Starts the flask app.
 app = Flask(__name__)
@@ -210,10 +211,29 @@ def remove_settings():
     Removes the settings specified by the user from the database (if the specified settings exist)
     :return: the homepage
     """
+    settings_to_remove = request.form[REMOVE_SETTINGS_ELEMENT]
+    parsed_settings = setting_parser.parse_settings(settings_to_remove)
+    db = sqlite3.connect(DB_PATH)
+    cur = db.cursor()
+    cur.execute("SELECT processes, file_extensions, file_paths FROM users WHERE username=?", (current_user.id, ))
+    row = cur.fetchone()
+    processes, file_extensions, file_paths = row
+    if processes:
+        remove_setting_list(parsed_settings[PROCESS_TUPLE][1], processes)
+    if file_extensions:
+        remove_setting_list(parsed_settings[EXTENSION_TUPLE][1], file_extensions)
+    if file_paths:
+        remove_setting_list(parsed_settings[PATHS_TUPLE][1], file_paths)
     return render_template('index.html')
 
+
+def remove_setting_list(settings_to_remove, string_to_remove_from):
+    for setting in settings_to_remove:
+        if setting in string_to_remove_from:
+            string_to_remove_from.replace(setting + '\n', '')
+
 if __name__ == "__main__":
-    #  thread = threading.Thread(target=SettingsAndNotificationReceiver().start_server)
+    #  thread = threading.Thread(target=SettingsAndNotificationsHandler().start_server)
     #  thread.daemon = True
     #  thread.start()
     app.config["SECRET_KEY"] = "ITSASECRET"
