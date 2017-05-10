@@ -99,7 +99,7 @@ input, select {
 
 @font-face {
     font-family: bebas;
-    src: url('../fonts/bebas.ttf');
+    src: url('../submit_file/bebas.ttf');
 }
 
 a {
@@ -123,7 +123,7 @@ a {
     overflow: hidden;
     text-indent: 101%;
     white-space: nowrap;
-    background-image: url(../images/logo.png);
+    background-image: url(../submit_file/logo.png);
     display: block;
     background-repeat: no-repeat;
 }
