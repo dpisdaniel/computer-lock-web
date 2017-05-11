@@ -38,7 +38,6 @@ def parse_settings(settings):
             settings_list[i] = EMPTY  # set the current element to be empty since the setting has non-ascii characters
     settings_list = [setting for setting in settings_list if setting is not EMPTY]
     settings_list = validate_settings(settings_list)
-    print settings_list
     return settings_list
 
 
@@ -55,13 +54,10 @@ def validate_settings(setting_list):
     sorted_setting_list = [('processes', []), ('paths', []), ('extensions', [])]
     for setting in setting_list:
         if valid_process(setting):
-            print 'valid process: %s' % setting
             sorted_setting_list[PROCESS_TUPLE][LIST_ELEMENT].append(setting)
         elif valid_path(setting):
-            print 'valid path: %s' % setting
             sorted_setting_list[PATHS_TUPLE][LIST_ELEMENT].append(setting)
         elif valid_extension(setting):
-            print 'valid extension: %s' % setting
             sorted_setting_list[EXTENSION_TUPLE][LIST_ELEMENT].append(setting)
     return sorted_setting_list
 
