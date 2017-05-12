@@ -22,6 +22,12 @@ PROCESS_TUPLE = 0
 PATHS_TUPLE = 1
 EXTENSION_TUPLE = 2
 DEFAULT_DB_VALUE = ''
+REMOVE_SETTINGS_ELEMENT = 'removed-settings'
+
+HOMEPAGE_ROUTE = '/'
+HOMEPAGE_FILE = 'index.html'
+LOG_IN_FILE = 'log_in.html'
+LOG_IN_ROUTE = '/log_in'
 
 # Starts the flask app.
 app = Flask(__name__)
@@ -30,12 +36,12 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-@app.route('/')
+@app.route(HOMEPAGE_ROUTE)
 def index():
     """
     Renders the homepage.
     """
-    return render_template('index.html')
+    return render_template(HOMEPAGE_FILE)
 
 
 @app.route('/submit_login', methods=['POST'])
@@ -49,8 +55,8 @@ def submit_login():
     if validate_login(username, password):
         user = User(username, password)
         login_user(user)
-        return render_template('successful_login.html')
-    return render_template('log_in.html')
+        return redirect(HOMEPAGE_ROUTE)
+    return render_template(LOG_IN_FILE)
 
 
 def validate_login(username, password):
@@ -123,19 +129,19 @@ def submit_signup():
         cur.execute("INSERT INTO users VALUES (?,?,?,?,?)", (username, password, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE))
         db.commit()
         db.close()
-        return render_template('successful_signup.html')
+        return redirect(HOMEPAGE_ROUTE)
     else:
         print user_data
         db.close()
         return render_template('user_already_exists.html')
 
 
-@app.route("/log_in")
+@app.route(LOG_IN_ROUTE)
 def log_in():
     """
     Generates the log in page.
     """
-    return render_template('log_in.html')
+    return render_template(LOG_IN_FILE)
 
 
 @app.route("/sign_up")
@@ -200,7 +206,7 @@ def add_settings():
     cur.execute("UPDATE users SET processes=?, file_extensions=?, file_paths=? WHERE username=?", (processes, file_extensions, file_paths, current_user.id))
     db.commit()
     db.close()
-    return render_template('index.html')
+    return redirect(HOMEPAGE_ROUTE)
 
 
 @app.route("/remove_settings", methods=['POST'])
@@ -210,13 +216,54 @@ def remove_settings():
     Removes the settings specified by the user from the database (if the specified settings exist)
     :return: the homepage
     """
-    return render_template('index.html')
+    settings_to_remove = request.form[REMOVE_SETTINGS_ELEMENT]
+    parsed_settings = setting_parser.parse_settings(settings_to_remove)
+    db = sqlite3.connect(DB_PATH)
+    cur = db.cursor()
+    cur.execute("SELECT processes, file_extensions, file_paths FROM users WHERE username=?", (current_user.id, ))
+    row = cur.fetchone()
+    processes, file_extensions, file_paths = row
+    if processes:
+        processes = remove_setting_list(parsed_settings[PROCESS_TUPLE][1], processes)
+    if file_extensions:
+        file_extensions = remove_setting_list(parsed_settings[EXTENSION_TUPLE][1], file_extensions)
+    if file_paths:
+        file_paths = remove_setting_list(parsed_settings[PATHS_TUPLE][1], file_paths)
+    cur.execute("UPDATE users SET processes=?, file_extensions=?, file_paths=? WHERE username=?", (processes, file_extensions, file_paths, current_user.id))
+    db.commit()
+    db.close()
+    return redirect(HOMEPAGE_ROUTE)
+
+
+def remove_setting_list(settings_to_remove, string_to_remove_from):
+    """
+    Removes the settings given by :param settings_to_remove from :param string_to_remove_from and returns the string
+    without the removed settings
+
+    :param settings_to_remove: a list of settings that need to be removed from the currently existing settings, if they
+    exist.
+    :param string_to_remove_from: a string containing the settings before the removal, separated by a new line
+    (with a new line after the last setting as well)
+
+    :return: a string containing the settings after the removal, each setting separated by a new line (with a new line
+    after the last setting as well)
+    """
+    existing_setting_list = string_to_remove_from.split('\n')
+    for setting in settings_to_remove:
+        for i in range(len(existing_setting_list)):
+            try:
+                if setting == existing_setting_list[i]:
+                    existing_setting_list.pop(i)
+            except IndexError:
+                break
+    string_with_removed_settings = '\n'.join(existing_setting_list)
+    return string_with_removed_settings
 
 if __name__ == "__main__":
-    #  thread = threading.Thread(target=SettingsAndNotificationReceiver().start_server)
+    #  thread = threading.Thread(target=SettingsAndNotificationsHandler().start_server)
     #  thread.daemon = True
     #  thread.start()
     app.config["SECRET_KEY"] = "ITSASECRET"
-    http = WSGIServer(('', WEB_SERVER_PORT), app)
+    http = WSGIServer(('localhost', WEB_SERVER_PORT), app)
     print "ok"
     http.serve_forever()

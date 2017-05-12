@@ -65,14 +65,14 @@
                     <div class="page-content">
                         <div class="row smooth-animation" style="top: 0px;" id="add">
                             <div class="title">
-                                <div class="title-text">Add your settings here</div>
+                                <div class="title-text">Add your settings here. Make sure each setting is separated by new lines</div>
                             </div>
 
                             <div class="content">
                                 <br>
                                 <form action="add_settings" method="POST" class="center">
                                     <center> 
-                                        <textarea name="added-settings" id="add-settings"></textarea>
+                                        <textarea name="added-settings" id="add-settings" required placeholder="Add your settings here"></textarea>
                                     </center>
                                     
                                     <br>
@@ -94,14 +94,14 @@
                     
                      <div class="row smooth-animation" style="top: -1000px; position: absolute;" id="remove">
                             <div class="title">
-                                <div class="title-text">Remove existing settings here</div>
+                                <div class="title-text">Remove existing settings here. Make sure each setting is separated by new lines</div>
                             </div>
                             
                             <div class="content">
                                 <br>
                                 <form action="remove_settings" method="POST" class="center">
                                     <center> 
-                                        <textarea id="remove-settings"></textarea>
+                                        <textarea name="removed-settings" id="remove-settings" required placeholder="Remove existing settings here"></textarea>
                                     </center>
                                     
                                     <br>
