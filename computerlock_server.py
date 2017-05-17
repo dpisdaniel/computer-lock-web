@@ -1,4 +1,3 @@
-__author__ = 'Daniel'
 from gevent.pywsgi import WSGIServer
 import threading
 from user_class import User
@@ -7,7 +6,10 @@ from flask import Flask, render_template, Response, url_for, request, redirect
 from flask_login import LoginManager, login_user, login_required, current_user
 import os
 import sqlite3
-import json
+import bcrypt
+
+__author__ = 'Daniel'
+
 
 USERNAME_ELEMENT = 'username'
 PASSWORD_ELEMENT = 'password'
@@ -32,6 +34,9 @@ LOG_IN_ROUTE = '/log_in'
 # Starts the flask app.
 app = Flask(__name__)
 app.debug = True
+#context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+# password is the pass phrase for decrypting the private key
+#context.load_cert_chain('cert.pem', keyfile='key.pem', password="pass")
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -71,11 +76,12 @@ def validate_login(username, password):
     db = sqlite3.connect(DB_PATH)
     cur = db.cursor()
     cur.execute("SELECT password FROM users WHERE username=?", (username,))
-    password2 = cur.fetchone()
+    fetched_password_tuple = cur.fetchone()
+    fetched_hashed_password = fetched_password_tuple[0]
     db.close()
-    if password2 is None:
+    if fetched_password_tuple is None:
         return False
-    if password2[0] == password:
+    if bcrypt.checkpw(password.encode('utf8'), fetched_hashed_password.encode('utf8')):
         return True
     return False
 
@@ -121,12 +127,13 @@ def submit_signup():
     """
     username = request.form[USERNAME_ELEMENT]
     password = request.form[PASSWORD_ELEMENT]
+    hashed_pass = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
     db = sqlite3.connect(DB_PATH)
     cur = db.cursor()
     cur.execute("SELECT * FROM users WHERE username=?", (username,))
     user_data = cur.fetchone()
     if user_data is None:  # Checks if the username inserted already exists in the database
-        cur.execute("INSERT INTO users VALUES (?,?,?,?,?)", (username, password, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE))
+        cur.execute("INSERT INTO users VALUES (?,?,?,?,?)", (username, hashed_pass, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE))
         db.commit()
         db.close()
         return redirect(HOMEPAGE_ROUTE)
@@ -264,6 +271,5 @@ if __name__ == "__main__":
     #  thread.daemon = True
     #  thread.start()
     app.config["SECRET_KEY"] = "ITSASECRET"
-    http = WSGIServer(('localhost', WEB_SERVER_PORT), app)
-    print "ok"
-    http.serve_forever()
+    http_server = WSGIServer(('localhost', WEB_SERVER_PORT), app, keyfile='key.pem', certfile='cert.pem')
+    http_server.serve_forever()
