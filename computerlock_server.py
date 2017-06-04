@@ -7,7 +7,7 @@ from flask_login import LoginManager, login_user, login_required, current_user
 import os
 import sqlite3
 import bcrypt
-
+import binascii
 __author__ = 'Daniel'
 
 
@@ -77,6 +77,8 @@ def validate_login(username, password):
     cur = db.cursor()
     cur.execute("SELECT password FROM users WHERE username=?", (username,))
     fetched_password_tuple = cur.fetchone()
+    if fetched_password_tuple is None:
+        return False
     fetched_hashed_password = fetched_password_tuple[0]
     db.close()
     if fetched_password_tuple is None:
@@ -133,7 +135,8 @@ def submit_signup():
     cur.execute("SELECT * FROM users WHERE username=?", (username,))
     user_data = cur.fetchone()
     if user_data is None:  # Checks if the username inserted already exists in the database
-        cur.execute("INSERT INTO users VALUES (?,?,?,?,?)", (username, hashed_pass, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE))
+        token = generate_token()
+        cur.execute("INSERT INTO users VALUES (?,?,?,?,?,?)", (username, hashed_pass, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE, DEFAULT_DB_VALUE, token))
         db.commit()
         db.close()
         return redirect(HOMEPAGE_ROUTE)
@@ -141,6 +144,26 @@ def submit_signup():
         print user_data
         db.close()
         return render_template('user_already_exists.html')
+
+
+def generate_token():
+    """
+    Generates a unique 10 byte token associated with each user for remote client log in purposes
+    
+    :return: a 20 characters long string containing the bytes generated  
+    """
+    token = binascii.hexlify(os.urandom(10))
+    db = sqlite3.connect(DB_PATH)
+    cur = db.cursor()
+    cur.execute("SELECT token FROM users WHERE token=?", (token,))
+    fetched_token = cur.fetchone()
+    while fetched_token is not None:  # if the token already exists
+        token = binascii.hexlify(os.urandom(10))
+        cur.execute("SELECT token FROM users WHERE token=?", (token,))
+        fetched_token = cur.fetchone()
+    db.close()
+    print token
+    return token
 
 
 @app.route(LOG_IN_ROUTE)

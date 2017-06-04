@@ -83,6 +83,7 @@ def valid_path(setting):
     Checks if :param setting is a valid file path
     a valid file path can either be an absolute path to the file, or just the file name (although it has to begin
     with a forward or backward slash)
+    examples: C:/some/path/file.adgf, C:/, /file
     :param setting: a string containing one setting entry
     :return: True if the setting is a valid file path and False otherwise
     """
