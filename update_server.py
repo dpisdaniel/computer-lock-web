@@ -3,7 +3,7 @@ import SocketServer
 import sqlite3
 import os
 RECEIVE_SIZE = 1024
-SERVER_IP_AND_PORT = '127.0.0.1'
+UPDATE_SERVER_IP_AND_PORT = ('0.0.0.0', 5151)
 PARAMETER_DELIMITER = ':'
 LENGTH_PARAM = 0
 TOKEN_PARAM = 1

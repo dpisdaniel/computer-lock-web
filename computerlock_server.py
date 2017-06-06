@@ -8,6 +8,7 @@ import os
 import sqlite3
 import bcrypt
 import binascii
+from update_server import UpdateServerRequestHandler, UpdateServer, UPDATE_SERVER_IP_AND_PORT
 __author__ = 'Daniel'
 
 
@@ -61,7 +62,7 @@ def submit_login():
         user = User(username, password)
         login_user(user)
         return redirect(HOMEPAGE_ROUTE)
-    return render_template(LOG_IN_FILE)
+    return redirect(LOG_IN_ROUTE)
 
 
 def validate_login(username, password):
@@ -188,7 +189,7 @@ def settings():
     """
     Generates the settings page
     """
-    return render_template('settings.html')
+    return render_template('settings.html', token=retrieve_token())
 
 
 @app.route('/submit_file/<filename>')
@@ -237,6 +238,21 @@ def add_settings():
     db.commit()
     db.close()
     return redirect(HOMEPAGE_ROUTE)
+
+
+@app.route("/rem_settings")
+@login_required
+def rem_settings():
+    return render_template('remove_settings.html', token=retrieve_token())
+
+
+def retrieve_token():
+    db = sqlite3.connect(DB_PATH)
+    cur = db.cursor()
+    cur.execute("SELECT token FROM users WHERE username=?", (current_user.id,))
+    row = cur.fetchone()
+    token = row[0]
+    return token
 
 
 @app.route("/remove_settings", methods=['POST'])
@@ -290,9 +306,10 @@ def remove_setting_list(settings_to_remove, string_to_remove_from):
     return string_with_removed_settings
 
 if __name__ == "__main__":
-    #  thread = threading.Thread(target=SettingsAndNotificationsHandler().start_server)
-    #  thread.daemon = True
-    #  thread.start()
+    update_server = UpdateServer(UPDATE_SERVER_IP_AND_PORT, UpdateServerRequestHandler, "cert.pem", "key.pem")
+    thread = threading.Thread(target=update_server.serve_forever)
+    thread.daemon = True
+    thread.start()
     app.config["SECRET_KEY"] = "ITSASECRET"
-    http_server = WSGIServer(('localhost', WEB_SERVER_PORT), app, keyfile='key.pem', certfile='cert.pem')
+    http_server = WSGIServer(('0.0.0.0', WEB_SERVER_PORT), app, keyfile='key.pem', certfile='cert.pem')
     http_server.serve_forever()

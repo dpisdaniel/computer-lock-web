@@ -6,11 +6,30 @@
         <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="submit_file/style.css">
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script id="window-switcher">
+            function switchPage(from, to){
+                from.parentNode.parentNode.parentNode.classList.add("swF");
+                $("#"+to).addClass("swT");
+                
+                $(".swF").css("position", 'absolute');
+                $(".swT").css("position", 'relative');
+                
+                $(".swT").css("top",$(".swF").css("top"));
+                $(".swF").css("top",-1000);
+                $(".swT").css("top", 0);
+                
+                setTimeout(function(){
+                $(".swT").removeClass("swT");
+                $(".swF").removeClass("swF");
+                },600);
+            }
+        </script>
     </head>
 
     <body>
         
         <header id="header">
+            
             <div class="wrapper">
                 <div id="logo">
                     <a href="/">ComputerLock</a>
@@ -40,34 +59,38 @@
                 <div class="wrapper">
                     
                     <div class="page-title">
-                        <h1>Welcome to the ComputerLock Project!</h1>
+                        <h1>Edit your settings!</h1>
                     </div>
                     
-                    <div class="page-content">
-                        <div class="row">
+                    
+                     <div class="row smooth-animation" style="top: 0px; position: relative;" id="remove">
                             <div class="title">
-                                <div class="title-text">What is this?</div>
+                                <div class="title-text">Remove existing settings here. Make sure each setting is separated by new lines.<br />Your token is {{ token }}.</div>
                             </div>
                             
                             <div class="content">
-                                <div>
-                                    This is the website for my final project in Gvahim's Cyber program.
-                                    Here you can sign up, and add settings to your account. <br />
-                                    The token you receive upon sign up you need to put in the admin file of each client installation of this project, in order for the clients to be able to associate themselves with 
-                                    your admin account.
+                                <br>
+                                <form action="remove_settings" method="POST" class="center">
+                                    <center> 
+                                        <textarea name="removed-settings" id="remove-settings" required placeholder="Remove existing settings here"></textarea>
+                                    </center>
+                                    
+                                    <br>
+                                    <div style="text-align:center;">
+                                        <button class="settings-button" type="submit">Save Removals</button>
+                                    </div>
+                                </form>
+
+                                <div style="text-align:center;">
+                                    <hr class="splitter">
+                                    Want to add new settings?
+                                    <div style="font-size: 8px;"><br></div>
+                                    <form action="/settings">
+                                        <button class="settings-button" type="submit">Add Settings</button>
+                                    </form>
+                                    <div><br></div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="title">
-                                <div class="title-text">Does this website have a purpose other than to give information to visitors?</div>
-                            </div>
-                            
-                            <div class="content">
-                                <div>You can sign up to receive a token and be able to set the file settings for your network of computers.</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

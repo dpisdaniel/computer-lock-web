@@ -65,7 +65,7 @@
                     <div class="page-content">
                         <div class="row smooth-animation" style="top: 0px;" id="add">
                             <div class="title">
-                                <div class="title-text">Add your settings here. Make sure each setting is separated by new lines</div>
+                                <div class="title-text">Add your settings here. Make sure each setting is separated by new lines.<br />Your token is {{ token }}.</div>
                             </div>
 
                             <div class="content">
@@ -85,7 +85,9 @@
                                     <hr class="splitter">
                                     Want to remove existing settings?
                                     <div style="font-size: 8px;"><br></div>
-                                    <button class="settings-button" onclick="switchPage(this, 'remove')">Remove Settings</button>
+                                    <form action="/rem_settings">
+                                        <button class="settings-button" type="submit">Remove Settings</button>
+                                    </form>
                                     <div><br></div>
                                 </div>
                             </div>

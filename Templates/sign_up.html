@@ -5,26 +5,6 @@
         <title>ComputerLock</title>
         <link href="https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="submit_file/style.css">
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-        <script id="window-switcher">
-            function switchPage(from, to){
-                from.parentNode.parentNode.parentNode.classList.add("swF");
-                $("#"+to).addClass("swT");
-                
-                $(".swF").css("position", 'absolute');
-                $(".swT").css("position", 'relative');
-                
-                $(".swT").css("top",$(".swF").css("top"));
-                $(".swF").css("top",-1000);
-                $(".swT").css("top", 0);
-                
-                setTimeout(function(){
-                $(".swT").removeClass("swT");
-                $(".swF").removeClass("swF");
-                },600);
-            }
-        </script>
-        
     </head>
 
     <body>
@@ -119,7 +99,9 @@
                                     <hr class="splitter">
                                     Already have an account?
                                     <div style="font-size: 8px;"><br></div>
-                                    <button onclick="switchPage(this, 'login')">Login</button>
+                                    <form action="/log_in">
+                                        <button type="submit">Login</button>
+                                    </form>
                                     <div><br></div>
                                 </div>
                             </div>
